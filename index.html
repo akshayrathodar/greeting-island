@@ -80,6 +80,30 @@
         .canvas-container {
             position: absolute !important;
         }
+
+        .property-container {
+            width: 300px;
+            border-radius: 5px;
+            padding: 20px;
+            min-height: 200px;
+            position: absolute;
+            right: 15px;
+            bottom: 15px;
+            box-shadow: 0 19px 38px rgba(0,0,0,0.30), 0 15px 12px rgba(0,0,0,0.22)
+        }
+
+        .form-group button {
+            height: 40px;
+            width: 40px;
+        }
+        .hide {
+            display: none;
+        }
+
+        .show {
+            display: block;
+        }
+
     </style>
 </head>
 
@@ -105,6 +129,10 @@
             <i class="fa fa-download" aria-hidden="true"></i>
         </div>
     </div>
+
+    <div class="property-container hide">
+    
+
     <div>
         <input class="fileinp" type="file" />
     </div>
@@ -115,6 +143,11 @@
 </body>
 <script>
     $( document ).ready(function() {
+        const canvasTypes = {
+            TEXT: 'text'
+        };
+        const fontFamily = ['Helvetica', 'Arial', 'Verdana', 'Tahoma', 'Impact', 'Gill Sans'];
+        const fontWeight = ['Smaller', 'Small', 'Medium', 'Bold', 'Bolder'];
         var canvas = new fabric.Canvas("canvas");
         canvas.setHeight(document.getElementById("both").clientHeight);
         canvas.setWidth(document.getElementById("both").clientWidth);
@@ -125,12 +158,56 @@
 
         // Add it to the canvas
         canvas.add(text);
+
+        canvas.on({
+            'selection:updated': HandleElement,
+            'selection:created': HandleElement,
+            'selection:cleared': ReleasedEvent
+        });
+
+        $('.cube').on('click',(e) => {
+            console.log(canvas.getActiveObject().get('type'))
+        })
+
+        function HandleElement(event) {
+            console.log(event)
+            if(canvas.getActiveObject().get('type') == canvasTypes.TEXT) {
+                let familyHtml,fontWeightHtml = '';
+                fontFamily.map((family) => {
+                    familyHtml+='<option>'+family+'</option>';
+                })
+
+                fontWeight.map((weight) => {
+                    fontWeightHtml+='<option>'+weight+'</option>';
+                })
+
+                // handle    
+                $('.property-container').html('<div class="form-group"><label class="col-form-label">Font Family</label><select class="form-control form-control-sm">'+familyHtml+'</select></div><div class="form-group"><label class="col-form-label">Font Size</label><input class="form-control" type="text" placeholder="Enter Font Size"></div></div><div class="form-group mt-3"><button type="button" class="btn btn-dark m-2"><bold>B</bold></button><button type="button" class="btn btn-dark m-2"><i> i </i></button><button type="button" class="btn btn-dark m-2">A</button><button type="button" class="btn btn-dark m-2">a</button></div><div class="form-group"><label class="col-form-label">Font Weight</label><select class="form-control form-control-sm">'+fontWeightHtml+'</select></div><div class="form-group"><label class="col-form-label">Font Color</label><input class="form-control" type="color" placeholder="Pick Color"></div></div>');
+                $('.property-container').removeClass('hide')
+            }
+        }
+
+        function ReleasedEvent() {
+            $('.property-container').addClass('hide')
+            $('.property-container').html();
+        }
         
     })
+
+    $(document).on('click','.btn',(e) => {
+        
+        if($(e.target).hasClass('btn-dark')) {
+            $(e.target).removeClass('btn-dark');
+            $(e.target).addClass('btn-primary');
+        } else if ($(e.target).hasClass('btn-primary')) {
+            $(e.target).addClass('btn-dark');
+            $(e.target).removeClass('btn-primary');
+        }
+    })
+
     $('#downloadme').on('click',(e) => {
         console.log($('#both')[0])
         html2canvas($('#both')[0],{useCORS: true}).then(canvas => {
-            console.log(canvas)
             const a = document.createElement("a");
             a.href = canvas.toDataURL("image/jpeg");
             a.download = "image.jpeg";
