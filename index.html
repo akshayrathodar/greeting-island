@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+        integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.6.3.min.js"
+        integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js"
+        integrity="sha512-01CJ9/g7e8cUmY0DFTMcUw/ikS799FHiOA0eyHsUWfOetgbx/t6oV4otQ5zXKQyIrQGTHSmRVPIgrgLcZi/WMA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css"
+        integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"
+        integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/510/fabric.min.js">
+    </script>
+    <style>
+        .img-container {
+            text-align: center;
+            height: 100%;
+            margin: auto;
+            width: 467px;
+            border: 1px solid;
+        }
+
+        .backimg {
+            position: absolute;
+            width: 310px;
+            height: 396px;
+            top: 75px;
+            z-index: -1;
+            left: 70px;
+        }
+
+        .container {
+            position: absolute;
+        }
+
+        .main-container {
+            width: 100%;
+            margin: auto;
+        }
+
+        .frame {
+            height: 100%;
+            width: 100%;
+            object-fit: cover;
+        }
+
+        .core-frame {
+            height: 350px;
+            width: 350px;
+            position: absolute;
+            top: 180px;
+            z-index: -1;
+            left: 60px;
+        }
+
+        .both-contain {
+            width: 467px;
+            position: absolute;
+        }
+
+        .fileinp {
+            position: absolute;
+            right: 0;
+        }
+
+        .side-panel {
+            position: absolute;
+            width: 80px;
+            height: 100%;
+            left: 0;
+            top: 0;
+        }
+
+        .cube {
+            padding: 18px;
+            font-size: 30px;
+            background-color: #d5d5d5;
+            border-radius: 5px;
+            margin: 5px 5px 5px 0;
+        }
+
+        .cnv {
+            width: 100%;
+            left: 0;
+            height: 100%;
+            position: absolute;
+        }
+
+        .canvas-container {
+            position: absolute !important;
+        }
+
+        .property-container {
+            width: 300px;
+            border-radius: 5px;
+            padding: 20px;
+            min-height: 200px;
+            position: absolute;
+            right: 15px;
+            bottom: 15px;
+            box-shadow: 0 19px 38px rgba(0, 0, 0, 0.30), 0 15px 12px rgba(0, 0, 0, 0.22)
+        }
+
+        .form-group button {
+            height: 40px;
+            width: 40px;
+        }
+
+        .hide {
+            display: none;
+        }
+
+        .show {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="main-container">
+        <div class="img-container" id="img-containe">
+            <div class="both-contain" id="both">
+                <canvas class="cnv" id="canvas"></canvas>
+                <div class="frame-cont">
+                    <img crossorigin="anonymous" class="frame"
+                        src="https://images.greetingsisland.com/images/cards/holidays/bunny%20and%20flowers%20wreath.png" />
+                </div>
+                <div id="core" class="core-frame">
+                    <img id="selectedImage" class="resizeImage" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="side-panel">
+        <div class="cube" onclick="selectFile();">
+            <i class="fa fa-upload" aria-hidden="true"></i>
+        </div>
+        <div class="cube" onclick="downloadImage();">
+            <i class="fa fa-download" aria-hidden="true"></i>
+        </div>
+        <div>
+            <button class="btn btn-dark m-2" onclick="addText();">Add Text</button>
+        </div>
+    </div>
+
+    <div class="property-container hide">
+        <div>
+            <input class="fileinp" type="file" id="fileInput" />
+        </div>
+        <div>
+            <button id="downloadme" class="btn btn-success fileinp">Download</button>
+        </div>
+        <select></select>
+
+</body>
+<script>
+    var text = new fabric.Text("Let's Celebrate!", {
+        left: 120,
+        top: 540,
+        fontFamily: 'Verdana',
+        fontSize: '30'
+    });
+    var text2 = new fabric.Text("30TH BIRTHDAY PARTY", {
+        left: 130,
+        top: 580,
+        fontFamily: 'Verdana',
+        fontSize: '18'
+    });
+    var canvas = new fabric.Canvas("canvas");
+    var activeObject = canvas.getActiveObject();
+
+
+    // Create an image object and add it to the canvas
+    // var image = new fabric.Image(document.getElementById('myImage'), {
+    //     left: 100,
+    //     top: 100
+    // });
+    // canvas.add(image);
+
+    // Enable selection for the image
+    // image.selectable = true;
+
+    // Flag to track if the image is being dragged
+    // var isDragging = false;
+
+    // Add the mouse:down event
+    // canvas.on('mouse:down', function (options) {
+    //     if (options.target) {
+    //         // Set the flag to true
+    //         isDragging = true;
+    //     }
+    // });
+
+    // Add the mouse:move event
+    // canvas.on('mouse:move', function (options) {
+    //     if (options.target && isDragging) {
+    // Get the mouse position
+    // var pointer = canvas.getPointer(options.e);
+
+    // Set the left and top position of the image based on the mouse position
+    // options.target.setLeft(pointer.x);
+    // options.target.setTop(pointer.y);
+
+    // Render the canvas
+    //         canvas.renderAll();
+    //     }
+    // });
+
+    // canvas.on('mouse:up', function (options) {
+    //     isDragging = false;
+    // });
+    // $('#selectImage').on('mouseup', function(){
+    //     console.log('mouse up');
+    // })
+    // $('#selectImage').on('mousedown', function(){
+    //     console.log('mouse down');
+    // })
+    $(document).ready(function () {
+        const canvasTypes = {
+            TEXT: 'text'
+        };
+        const fontFamily = ['Helvetica', 'Arial', 'Verdana', 'Tahoma', 'Impact', 'Gill Sans'];
+        const fontWeight = [{ weight: 'Smaller', value: 200 }, { weight: 'Small', value: 300 }, { weight: 'Medium', value: 400 }, { weight: 'bold', value: 600 }, { weight: 'bolder', value: 800 }];
+        canvas.setHeight(document.getElementById("both").clientHeight);
+        canvas.setWidth(document.getElementById("both").clientWidth);
+
+
+        // Add it to the canvas
+        canvas.add(text, text2);
+
+        canvas.on({
+            'selection:updated': HandleElement,
+            'selection:created': HandleElement,
+            'selection:cleared': ReleasedEvent
+        });
+
+        $('.cube').on('click', (e) => {
+            console.log(canvas.getActiveObject().get('type'))
+        })
+
+        function HandleElement(event) {
+            console.log(event)
+            if (canvas.getActiveObject().get('type') == canvasTypes.TEXT) {
+                let familyHtml, fontWeightHtml = '';
+                fontFamily.map((family) => {
+                    familyHtml += `<option style="font-family:${family}">${family}</option>`;
+                })
+
+                fontWeight.map((item) => {
+                    fontWeightHtml += `<option value=${item.value}>${item.weight}</option>`;
+                })
+                console.log(canvas.getActiveObject().fontWeight);
+                // handle    
+                $('.property-container').html(`<div class="form-group">
+                    <label class="col-form-label">Font Family</label>
+                    <select onchange="changeFontFamily(event);" class="form-control form-control-sm">' + ${familyHtml} + '</select>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-form-label">Font Size</label>
+                        <input class="form-control" onchange="changeFontSize(event);" value=${canvas.getActiveObject().fontSize} type="text" placeholder="Enter Font Size">
+                        </div>
+                    </div>
+                    <div class="form-group mt-3">
+                        <button type="button" onclick="changeToBold();" class="btn btn-dark m-2"><b>B</b></button>
+                        <button type="button" onclick="changeToItalic();" class="btn btn-dark m-2"><i>i</i></button>
+                        <button type="button" onclick="changeToUppercase();" class="btn btn-dark m-2">A</button>
+                        <button type="button" onclick="changetoLowerCase();" class="btn btn-dark m-2">a</button>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-form-label">Font Weight</label>
+                        <select class="form-control form-control-sm" onchange="changeFontWeight(event);">' + ${fontWeightHtml} + '</select>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-form-label">Font Color</label>
+                        <input class="form-control" onchange="changeFontColor(event);" value=${canvas.getActiveObject().fill} type="color" placeholder="Pick Color">
+                    </div>
+                    <div class="form-group">
+                        <button type="button" onclick="deleteText();" class="btn btn-danger m-2"><i class="fa fa-trash"></i></button>
+                        <button type="button" class="btn btn-primary m-2" onclick="duplicateText();"><i class="fa fa-clone"></i></button>
+                    </div>
+                    </div>`);
+                $('.property-container').removeClass('hide')
+            }
+        }
+        function ReleasedEvent() {
+            $('.property-container').addClass('hide')
+            $('.property-container').html();
+        }
+    })
+    function addText() {
+        let input = document.createElement('input');
+        input.type = "text";
+        input.id = 'textInput'
+        let btn = document.createElement('input');
+        btn.type = 'button';
+        btn.value = "Submit Text";
+        btn.onclick = function () {
+            var inputText = new fabric.Text(input.value, {
+                left: 130,
+                top: 490,
+                fontFamily: 'Verdana',
+                fontSize: '18'
+            });
+            canvas.add(inputText);
+            canvas.setActiveObject(inputText);
+            canvas.renderAll();
+        }
+        document.body.appendChild(input);
+        document.body.appendChild(btn);
+    }
+    function AddTextToCanvas() {
+        console.log('called')
+        // let input = document.getElementById('textInput');
+        // console.log(input);
+        // var inputText = new fabric.Text(input, {
+        //     left: 130,
+        //     top: 490,
+        //     fontFamily: 'Verdana',
+        //     fontSize: '18'
+        // });
+        // canvas.add(inputText);
+        // canvas.renderAll();
+    }
+    function duplicateText() {
+        canvas.getActiveObject().clone(function (cloned) {
+            canvas.discardActiveObject();
+            cloned.set({
+                top: cloned.top + 30,
+                evented: true
+            })
+            canvas.add(cloned)
+            canvas.setActiveObject(cloned);
+        })
+        canvas.renderAll();
+    }
+    function deleteText() {
+        canvas.remove(canvas.getActiveObject());
+        canvas.renderAll();
+    }
+    function changeFontColor(event) {
+        canvas.getActiveObject().set('fill', event.target.value);
+        canvas.renderAll();
+    }
+    const toTitleUpperCase = (phrase) => {
+        if (phrase === phrase.toUpperCase()) {
+            return phrase
+                .toLowerCase()
+                .split(' ')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ');
+        }
+        else {
+            return phrase.toUpperCase();
+        }
+
+    };
+    const toTitleLowerCase = (phrase) => {
+        if (phrase === phrase.toLowerCase()) {
+            return phrase
+                .toLowerCase()
+                .split(' ')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ');
+        }
+        else {
+            return phrase.toLowerCase();
+        }
+    };
+
+    function changeToUppercase() {
+        let result = toTitleUpperCase(canvas.getActiveObject().get('text').toString());
+        canvas.getActiveObject().set('text', result);
+        canvas.renderAll();
+    }
+    function changetoLowerCase() {
+        let result = toTitleLowerCase(canvas.getActiveObject().get('text').toString());
+        canvas.getActiveObject().set('text', result);
+        canvas.renderAll();
+    }
+    function selectFile() {
+        let input = document.getElementById('fileInput');
+        input.click();
+    }
+
+    function changeFontSize(event) {
+        canvas.getActiveObject().set('fontSize', event.target.value);
+        canvas.renderAll();
+    }
+    function changeFontWeight(event) {
+        canvas.getActiveObject().set('fontWeight', event.target.value);
+        canvas.renderAll();
+    }
+    function changeFontFamily(event) {
+        canvas.getActiveObject().set('fontFamily', event.target.value);
+        canvas.renderAll();
+    }
+
+    function downloadImage() {
+        let downloadbtn = document.getElementById('downloadme');
+        downloadbtn.click();
+    }
+    function changeToBold() {
+        let currentFontWeight = canvas.getActiveObject().fontWeight;
+        if (currentFontWeight === "normal") {
+            canvas.getActiveObject().set('fontWeight', 'bold');
+        }
+        else {
+            canvas.getActiveObject().set('fontWeight', 'normal');
+        }
+        canvas.renderAll();
+    }
+    function changeToItalic() {
+        let currentFontWeight = canvas.getActiveObject().fontWeight;
+        if (currentFontWeight === "normal") {
+            canvas.getActiveObject().set('fontWeight', 'italic');
+        }
+        else {
+            canvas.getActiveObject().set('fontWeight', 'normal');
+        }
+        canvas.renderAll();
+    }
+    $(document).on('click', '.btn', (e) => {
+
+        if ($(e.target).hasClass('btn-dark')) {
+            $(e.target).removeClass('btn-dark');
+            $(e.target).addClass('btn-primary');
+        } else if ($(e.target).hasClass('btn-primary')) {
+            $(e.target).addClass('btn-dark');
+            $(e.target).removeClass('btn-primary');
+        }
+    })
+
+    $('#downloadme').on('click', (e) => {
+        console.log($('#both')[0])
+        html2canvas($('#both')[0], { useCORS: true }).then(canvas => {
+            const a = document.createElement("a");
+            a.href = canvas.toDataURL("image/jpeg");
+            a.download = "image.jpeg";
+            a.click();
+        });
+
+    })
+
+    $('.fileinp').on('change', (e) => {
+        var file = e.target.files[0];
+        var reader = new FileReader();
+        reader.onloadend = function () {
+            let image = document.getElementById('selectedImage');
+            image.style.position = 'fixed';
+            image.src = reader.result;
+        }
+        if (file) {
+            reader.readAsDataURL(file);
+        }
+    })
+</script>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"
+    integrity="sha512-CeIsOAsgJnmevfCi2C7Zsyy6bQKi43utIjdA87Q0ZY84oDqnI0uwfM9+bKiIkI75lUeI00WG/+uJzOmuHlesMA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
+    integrity="sha512-qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNTlrdUmTzrDgektczlKNRRhy5X5AAOnx5S09ydFYWWNSfcEqDTTHgtNA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"
+    integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V"
+    crossorigin="anonymous"></script>
+
+</html>
