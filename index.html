@@ -123,6 +123,14 @@
         .show {
             display: block;
         }
+
+        .side-image-selector {
+            position: absolute;
+            width: 80px;
+            height: 100%;
+            left: 90%;
+            top: 0;
+        }
     </style>
 </head>
 
@@ -133,8 +141,9 @@
             <div class="both-contain" id="both">
                 <canvas class="cnv" id="canvas"></canvas>
                 <div class="frame-cont">
-                    <img crossorigin="anonymous" class="frame"
-                        src="https://images.greetingsisland.com/images/cards/holidays/bunny%20and%20flowers%20wreath.png" />
+                    <img crossorigin="anonymous" class="frame" id="frameImage"
+                        src="https://images.greetingsisland.com/images/announcements/save-the-date/meadow%20wreath%201.png" />
+
                 </div>
                 <div id="core" class="core-frame">
                     <img id="selectedImage" class="resizeImage" />
@@ -153,8 +162,11 @@
         <div>
             <button class="btn btn-dark m-2" onclick="addText();">Add Text</button>
         </div>
+        <div>
+            <button class="btn btn-dark m-2" onclick="addImage();">Add Image</button>
+        </div>
     </div>
-
+    <!-- <img src="https://images.greetingsisland.com/images/invitations/birthday/new-era%20white.png" onclick="changeImageFrame(this);" height="300px" width="300px"/>     -->
     <div class="property-container hide">
         <div>
             <input class="fileinp" type="file" id="fileInput" />
@@ -166,67 +178,55 @@
 
 </body>
 <script>
-    var text = new fabric.Text("Let's Celebrate!", {
-        left: 120,
-        top: 540,
-        fontFamily: 'Verdana',
+    // var text2 = new fabric.Text("celebrating the memory of", {
+    //     left: 30,
+    //     top: 430,
+    //     fontFamily: 'Bentham',
+    //     fontSize: '40'
+    // });
+
+    var nametext = new fabric.Text("SCARLET HENDERSON", {
+        left: 80,
+        top: 460,
+        fontFamily: 'Arimo',
         fontSize: '30'
     });
-    var text2 = new fabric.Text("30TH BIRTHDAY PARTY", {
-        left: 130,
-        top: 580,
-        fontFamily: 'Verdana',
-        fontSize: '18'
+    var text = new fabric.Text(`The Henderson family is sad to announce
+        the passing of Scarlet Henderson.
+        Her laughter and warm presence
+             will be missed by all.`, {
+        left: 120,
+        top: 520,
+        fontFamily: 'Bentham',
+        fontSize: '14'
     });
+    
     var canvas = new fabric.Canvas("canvas");
     var activeObject = canvas.getActiveObject();
 
 
-    // Create an image object and add it to the canvas
-    // var image = new fabric.Image(document.getElementById('myImage'), {
-    //     left: 100,
-    //     top: 100
-    // });
-    // canvas.add(image);
+    function changeImageFrame(response) {
+        let frameImage = document.getElementById('frameImage');
+        frameImage.src = response.src;
+    }
+    function addImage() {
+        let fileInput = document.createElement('input');
+        fileInput.type = "file";
+        fileInput.click();
+        fileInput.onchange = function (e) {
+            let file = e.target.files[0];
+            let reader = new FileReader();
+            reader.onload = function (event) {
+                let img = new Image();
+                img.src = event.target.result;
 
-    // Enable selection for the image
-    // image.selectable = true;
-
-    // Flag to track if the image is being dragged
-    // var isDragging = false;
-
-    // Add the mouse:down event
-    // canvas.on('mouse:down', function (options) {
-    //     if (options.target) {
-    //         // Set the flag to true
-    //         isDragging = true;
-    //     }
-    // });
-
-    // Add the mouse:move event
-    // canvas.on('mouse:move', function (options) {
-    //     if (options.target && isDragging) {
-    // Get the mouse position
-    // var pointer = canvas.getPointer(options.e);
-
-    // Set the left and top position of the image based on the mouse position
-    // options.target.setLeft(pointer.x);
-    // options.target.setTop(pointer.y);
-
-    // Render the canvas
-    //         canvas.renderAll();
-    //     }
-    // });
-
-    // canvas.on('mouse:up', function (options) {
-    //     isDragging = false;
-    // });
-    // $('#selectImage').on('mouseup', function(){
-    //     console.log('mouse up');
-    // })
-    // $('#selectImage').on('mousedown', function(){
-    //     console.log('mouse down');
-    // })
+                let fabricImage = new fabric.Image(img);
+                canvas.add(fabricImage);
+            }
+            reader.readAsDataURL(file);
+            canvas.renderAll();
+        }
+    }
     $(document).ready(function () {
         const canvasTypes = {
             TEXT: 'text'
@@ -238,7 +238,7 @@
 
 
         // Add it to the canvas
-        canvas.add(text, text2);
+        canvas.add(nametext, text);
 
         canvas.on({
             'selection:updated': HandleElement,
@@ -320,19 +320,7 @@
         document.body.appendChild(input);
         document.body.appendChild(btn);
     }
-    function AddTextToCanvas() {
-        console.log('called')
-        // let input = document.getElementById('textInput');
-        // console.log(input);
-        // var inputText = new fabric.Text(input, {
-        //     left: 130,
-        //     top: 490,
-        //     fontFamily: 'Verdana',
-        //     fontSize: '18'
-        // });
-        // canvas.add(inputText);
-        // canvas.renderAll();
-    }
+
     function duplicateText() {
         canvas.getActiveObject().clone(function (cloned) {
             canvas.discardActiveObject();
@@ -392,6 +380,7 @@
     function selectFile() {
         let input = document.getElementById('fileInput');
         input.click();
+
     }
 
     function changeFontSize(event) {
@@ -458,7 +447,12 @@
         var reader = new FileReader();
         reader.onloadend = function () {
             let image = document.getElementById('selectedImage');
-            image.style.position = 'fixed';
+            image.style.minHeight = '200px';
+            image.style.minWidth = '200px'; 
+            image.style.position = 'absolute';
+            image.style.left = '63px';
+            image.style.top = '-22px';
+            image.style.scale = 1.5;
             image.src = reader.result;
         }
         if (file) {
